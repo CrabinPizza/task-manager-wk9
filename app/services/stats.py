@@ -1,5 +1,6 @@
 """Summary statistics for the dashboard."""
 
+from collections import Counter
 from datetime import date
 
 from app.models import Task, TaskStatus
@@ -12,26 +13,18 @@ def task_summary(today=None):
     tasks = Task.query.all()
     total = len(tasks)
 
-    todo = 0
-    for task in tasks:
-        if task.status == TaskStatus.TODO:
-            todo += 1
+    status_counts = Counter(task.status for task in tasks)
+    todo = status_counts[TaskStatus.TODO]
+    in_progress = status_counts[TaskStatus.IN_PROGRESS]
+    completed = status_counts[TaskStatus.COMPLETED]
 
-    in_progress = 0
-    for task in tasks:
-        if task.status == TaskStatus.IN_PROGRESS:
-            in_progress += 1
-
-    completed = 0
-    for task in tasks:
-        if task.status == TaskStatus.COMPLETED:
-            completed += 1
-
-    overdue = 0
-    for task in tasks:
-        if task.due_date is not None and task.due_date < today:
-            if task.status != TaskStatus.COMPLETED:
-                overdue += 1
+    overdue = sum(
+        1
+        for task in tasks
+        if task.due_date is not None
+        and task.due_date < today
+        and task.status != TaskStatus.COMPLETED
+    )
 
     if total > 0:
         completion_rate = round(100 * completed / total, 1)
