@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && { ruff check . && python -m pytest -x -q --tb=short; } 1>&2 || exit 2"
+          }
+        ]
+      }
+    ]
+  }
+}
