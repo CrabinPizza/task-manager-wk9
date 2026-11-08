@@ -325,10 +325,6 @@ class TestCompleteTask:
         assert completed.status in (TaskStatus.COMPLETED, TaskStatus.DONE)
         assert completed.status != TaskStatus.TODO
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="complete_task writes the legacy TaskStatus.DONE instead of TaskStatus.COMPLETED",
-    )
     def test_uses_current_completed_status(self, app):
         task = svc.create_task("t")
         assert svc.complete_task(task.id).status == TaskStatus.COMPLETED

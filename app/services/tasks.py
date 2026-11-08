@@ -119,7 +119,7 @@ def update_task(task_id, **fields):
 def complete_task(task_id):
     """Mark a task as finished and return it."""
     task = get_task(task_id)
-    task.status = TaskStatus.DONE
+    task.status = TaskStatus.COMPLETED
     db.session.commit()
     return task
 
