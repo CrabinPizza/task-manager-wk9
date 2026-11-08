@@ -73,6 +73,28 @@ def list_tasks(status=None, priority=None):
     return query.order_by(Task.id).all()
 
 
+def _escape_like(text):
+    """Escape LIKE wildcards so they match literally (used with escape="\\")."""
+    return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
+def search_tasks(query):
+    """Return tasks whose title or description contains query (case-insensitive), newest first."""
+    if query is None or not str(query).strip():
+        raise ValidationError("query is required")
+    pattern = f"%{_escape_like(str(query).strip())}%"
+    return (
+        Task.query.filter(
+            db.or_(
+                Task.title.ilike(pattern, escape="\\"),
+                Task.description.ilike(pattern, escape="\\"),
+            )
+        )
+        .order_by(Task.id.desc())
+        .all()
+    )
+
+
 def update_task(task_id, **fields):
     """Update the given fields of a task and return it."""
     unknown = set(fields) - UPDATABLE_FIELDS

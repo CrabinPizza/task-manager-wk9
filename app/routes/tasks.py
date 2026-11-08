@@ -15,6 +15,13 @@ def list_tasks():
     return jsonify([t.to_dict() for t in tasks])
 
 
+@bp.get("/search")
+def search_tasks():
+    """Return tasks matching the q query parameter, newest first."""
+    tasks = task_service.search_tasks(request.args.get("q"))
+    return jsonify([t.to_dict() for t in tasks])
+
+
 @bp.post("")
 def create_task():
     data = request.get_json(silent=True) or {}
